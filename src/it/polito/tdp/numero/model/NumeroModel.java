@@ -1,18 +1,32 @@
 package it.polito.tdp.numero.model;
 
 import java.security.InvalidParameterException;
+import java.util.LinkedList;
+import java.util.List;
+
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 
 public class NumeroModel {
 	
+	private List<Integer>tentativi;
+	
 	private final int NMAX = 100;
 	private final int TMAX = 8;
-
 	private int segreto;
-	private int tentativiFatti;
+	
+	private IntegerProperty tentativiFatti;
+	
+	//private int tentativiFatti;
 	private boolean inGioco = false;
 	
 	public NumeroModel() {
 		inGioco = false;
+		
+		//Essendo IntegerProperty una classe astratta, per creare l'oggetto uso SimpleIP
+		tentativiFatti = new SimpleIntegerProperty();
+		
+		tentativi = new LinkedList<Integer>();	
 	}
 	
 	//METODI PUBBLICI perchè saranno usati dal controllore
@@ -22,8 +36,11 @@ public class NumeroModel {
 	 */
 	public void newGame() {
 		this.segreto = (int) (Math.random() * NMAX) + 1;
-		this.tentativiFatti = 0;
+		this.tentativiFatti.set(0);;
 		this.inGioco = true;
+		
+		//Ogni volta che inizio una nuova partita mi pulisce la lista
+		this.tentativi = new LinkedList<Integer>();
 		
 	}
 	
@@ -53,11 +70,14 @@ public class NumeroModel {
 		
 		//gestisco il tentativo:
 		
-		this.tentativiFatti++;
+		this.tentativiFatti.set(this.tentativiFatti.get() + 1);
+		
+		this.tentativi.add(t);
 		
 		//se esaurisco i tentativi la partita finisce
-		if(this.tentativiFatti == this.TMAX) {
+		if(this.tentativiFatti.get() == this.TMAX) {
 			this.inGioco = false;
+			
 		}
 		
 		//HO INDOVINATO:
@@ -67,7 +87,7 @@ public class NumeroModel {
 		}
 		
 		//NON HO INDOVINATO:
-		//tentativo troop alto
+		//tentativo troppo alto
 		if(t > this.segreto) {
 			return 1;
 		}
@@ -79,7 +99,10 @@ public class NumeroModel {
 		if(t<1 || t> NMAX) {
 			return false;
 		} else {
-			return true;
+			if(this.tentativi.contains(t))
+				return false;
+			else
+				return true;
 		}
 	}
 
@@ -92,14 +115,26 @@ public class NumeroModel {
 	public int getSegreto() {
 		return segreto;
 	}
-
-	public int getTentativiFatti() {
-		return tentativiFatti;
-	}
 	
 	public int getTMAX() {
 		return TMAX;
 	}
+	
+	
+	//Getter & Setter per la property tentativiFatti
+	public final IntegerProperty tentativiFattiProperty() {
+		return this.tentativiFatti;
+	}
+	
+	public final int getTentativiFatti() {
+		return this.tentativiFattiProperty().get();
+	}
+	
+	public final void setTentativiFatti(final int tentativiFatti) {
+		this.tentativiFattiProperty().set(tentativiFatti);
+	}
+	
+	
 	
 	
 	

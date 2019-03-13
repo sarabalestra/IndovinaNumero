@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import it.polito.tdp.numero.model.NumeroModel;
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
@@ -38,10 +39,6 @@ public class NumeroController {
 	private TextArea txtMessaggi;
 
 	
-	public void setModel(NumeroModel model) {
-		this.model = model;
-	}
-	
 	@FXML
 	void handleNuovaPartita(ActionEvent event) {
 		//Gestisce l'inizio di una nuova partita
@@ -51,7 +48,8 @@ public class NumeroController {
 		boxControlloTentativi.setDisable(false);
 		txtMessaggi.clear();
 		txtTentativo.clear();
-		txtRimasti.setText(Integer.toString(model.getTMAX()));
+		
+		//txtRimasti.setText(Integer.toString(0));
 		
 		//Comunico al modello di iniziare una nuova partita
 		model.newGame();
@@ -99,8 +97,8 @@ public class NumeroController {
 			txtMessaggi.appendText("Tentativo troppo ALTO\n");
 		}
 
-		// Aggiornare interfaccia con n. tentativi rimasti
-		txtRimasti.setText(Integer.toString(model.getTMAX()- model.getTentativiFatti()));
+		// Aggiornare interfaccia con n. tentativi fatti
+		//txtRimasti.setText(Integer.toString(model.getTentativiFatti()));
 
 		//Devo vedere se ho finito i tentativi, dallo stato di inGioco
 		if(!model.isInGioco()) {
@@ -125,4 +123,12 @@ public class NumeroController {
 		assert txtMessaggi != null : "fx:id=\"txtMessaggi\" was not injected: check your FXML file 'Numero.fxml'.";
 
 	}
+	
+	public void setModel(NumeroModel model) {
+		this.model = model;
+		
+		//Grazie a questo codice posso eliminare txtRimasti.setText()
+		txtRimasti.textProperty().bind(Bindings.convert(model.tentativiFattiProperty()));
+	}
+	
 }
